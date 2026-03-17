@@ -2,7 +2,7 @@
 
 **Herramienta de análisis de logs para aplicaciones GeneXus en Windows**
 
-![Version](https://img.shields.io/badge/version-1.3-blue)
+![Version](https://img.shields.io/badge/version-1.4-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue)
 
@@ -15,6 +15,7 @@
 ### Características principales
 
 ✅ **Detección de demoras** - Identifica operaciones lentas  
+✅ **Script SQL para Oracle** - Genera script ejecutable con las sentencias SQL que demoran  
 ✅ **Análisis de errores** - Separa y agrupa errores y warnings  
 ✅ **Totalización por programa** - Cuenta ejecuciones de cada programa  
 ✅ **Totalización por SQL** - Identifica queries más frecuentes  
@@ -53,7 +54,7 @@
 C:\KBLogAnalyzer> KBLogAnalyzer.cmd
 
 ==========================================
-  KBLogAnalyzer v1.3 (2026.03)
+  KBLogAnalyzer v1.4 (2026.03)
 ==========================================
 
 Directorio de los logs: C:\MiApp\logs
@@ -72,7 +73,7 @@ Separa Errores, Warnings y no conocidos? (Y/N): Y
 
 | Análisis | Script | Descripción | Archivo de Salida |
 |----------|--------|-------------|-------------------|
-| **Detectar Demoras** | `detectDelays.ps1` | Operaciones que superan umbral de tiempo | `detectDelays.txt` |
+| **Detectar Demoras** | `detectDelays.ps1` | Operaciones que superan umbral de tiempo | `detectDelays.txt`, `DelaysSQLStatements.sql` |
 | **Errores/Warnings** | `filterErrorWarningAndUnknown.ps1` | Separa errores, warnings y líneas desconocidas | `ErrorWarning.txt`, `unknownLogType.txt` |
 | **Demoras por Programa** | `delaysByProgram.ps1` | Agrupa y totaliza demoras por programa | `DelaysByProgramDetail.txt`, `DelaysByProgramSummary.txt` |
 | **Total por Programa** | `totalByProgram.ps1` | Cuenta ejecuciones de cada programa | `totalByPrograms.txt` |

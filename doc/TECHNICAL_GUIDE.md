@@ -52,35 +52,43 @@
 
 ### 1. detectDelays.ps1
 
-**Propósito**: Detectar operaciones que exceden un umbral de tiempo
+**Propósito**: Detectar operaciones que exceden un umbral de tiempo y generar script SQL para Oracle
 
 **Parámetros**:
 ```powershell
 param(
     [int]$threshold,
     [string]$directoryPath,
-    [string]$outputFile
+    [string]$outputFile,
+    [string]$outputSQLFile
 )
 ```
 
 **Lógica Principal**:
 ```powershell
-# 1. Leer todas las líneas del log
-Get-Content $logFile | ForEach-Object {
-    # 2. Extraer timestamp y parsear a DateTime
-    if ($line -match 'timestamp_pattern') {
-        $currentTime = [DateTime]::Parse($matches[1])
-        
-        # 3. Calcular diferencia con línea anterior
-        $diff = ($currentTime - $previousTime).TotalMilliseconds
-        
-        # 4. Si supera threshold, registrar
-        if ($diff -gt $threshold) {
-            Write-OutputAndFile -message "..." -filePath $outputFile
-        }
-    }
+# 1. Rastrear última línea de parámetros (ExecuteReader/ExecuteNonQuery)
+if ($line -match "Execute(?:Reader|NonQuery): Parameters") {
+    $lastParams = ParseParameters $line
+}
+
+# 2. Detectar demoras entre líneas consecutivas
+$deltaMs = ($currTimeRef - $prevTime).TotalMilliseconds
+if ($deltaMs -gt $threshold) {
+    # 3. Si la línea contiene stmt:, extraer SQL
+    $sql = ExtractSQL $prevLine
+    # 4. Reemplazar bind variables (:param) con valores reales
+    $sqlWithValues = ReplaceBindVariables $sql $lastParams
 }
 ```
+
+**Funciones de resolución de parámetros**:
+- `ParseParameters`: Extrae pares `nombre='valor'` de líneas `ExecuteReader: Parameters` y `ExecuteNonQuery: Parameters`
+- `FormatOracleValue`: Detecta fechas y las convierte a `TO_DATE()`, demás valores quedan como strings
+- `ReplaceBindVariables`: Sustituye `:paramName` por valores reales en el SQL
+
+**Salidas**:
+- `detectDelays.txt`: Listado de operaciones lentas
+- `DelaysSQLStatements.sql`: Script Oracle con `EXPLAIN PLAN FOR`, `SET TIMING ON/OFF` y valores resueltos
 
 **Optimizaciones**:
 - Lectura de archivo línea por línea (stream) para eficiencia de memoria

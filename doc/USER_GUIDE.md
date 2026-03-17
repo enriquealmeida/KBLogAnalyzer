@@ -25,7 +25,7 @@
 
 ```
 ==========================================
-  KBLogAnalyzer v1.3 (2026.03)
+  KBLogAnalyzer v1.4 (2026.03)
 ==========================================
 ```
 
@@ -72,7 +72,7 @@ Genera arbol de llamadas entre programas? (Y/N): N
 Al terminar el procesamiento:
 - Se muestra un mensaje de confirmación
 - Se abre automáticamente el Explorador de Windows con los resultados
-- Revisar los archivos `.txt` generados
+- Revisar los archivos `.txt` y `.sql` generados
 
 ---
 
@@ -123,6 +123,13 @@ Puede presionar ENTER para usar valores predeterminados:
 - **500 ms**: Análisis general de rendimiento
 - **1000 ms**: Problemas evidentes de performance
 - **100 ms**: Análisis muy detallado (genera mucho output)
+
+**Salida adicional**: `DelaysSQLStatements.sql`
+- Se genera automáticamente junto con `detectDelays.txt`
+- Contiene las sentencias SQL que presentaron demoras, con los bind variables reemplazados por valores reales
+- Listo para ejecutar en Oracle SQL*Plus o SQL Developer
+- Incluye `EXPLAIN PLAN FOR` para cada sentencia y `SET TIMING ON` para medir tiempos
+- Convierte automáticamente fechas al formato `TO_DATE()` de Oracle
 
 ---
 

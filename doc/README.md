@@ -6,7 +6,7 @@
 
 ## Versión
 
-**v1.3** (Marzo 2026)
+**v1.4** (Marzo 2026)
 
 ---
 
@@ -25,7 +25,6 @@ KBLogAnalyzer/
 │
 ├── KBLogAnalyzer.cmd          # Script principal (Batch)
 ├── TestKBLogAnalyzer.cmd      # Script de pruebas
-├── Readme.txt                 # Archivo de ayuda básica
 ├── FaltaHacer.txt            # Lista de tareas pendientes
 │
 ├── pscode/                    # Scripts PowerShell
@@ -77,7 +76,7 @@ KBLogAnalyzer/
 C:\KBLogAnalyzer> KBLogAnalyzer.cmd
 
 ==========================================
-  KBLogAnalyzer v1.3 (2026.03)
+  KBLogAnalyzer v1.4 (2026.03)
 ==========================================
 
 Directorio de los logs: C:\MiApp\logs
@@ -99,21 +98,41 @@ Agrupa y totaliza por programa? (Y/N): Y
 
 **Script**: `detectDelays.ps1`
 
-**Descripción**: Identifica operaciones que superan un umbral de tiempo especificado.
+**Descripción**: Identifica operaciones que superan un umbral de tiempo especificado. Adicionalmente, genera un script SQL para Oracle con las sentencias SQL que presentaron demoras, reemplazando los bind variables (`:param`) por los valores reales extraídos del log.
 
 **Parámetros**:
 - `threshold`: Tiempo mínimo en milisegundos (default: 500 ms)
 - `directoryPath`: Directorio de entrada con logs
 - `outputFile`: Archivo de salida con resultados
+- `outputSQLFile`: Archivo SQL de salida para Oracle (default: `DelaysSQLStatements.sql`)
 
-**Salida**: `detectDelays.txt`
+**Salidas**:
+- `detectDelays.txt`: Listado de todas las operaciones que superan el umbral
+- `DelaysSQLStatements.sql`: Script SQL para Oracle listo para ejecutar
 
-**Formato**:
+**Formato de detectDelays.txt**:
 ```
 Archivo: mi_log.log
   Línea 1234: [2500 ms] Operación lenta detectada...
   Línea 5678: [3500 ms] Otra operación lenta...
 ```
+
+**Formato de DelaysSQLStatements.sql**:
+```sql
+SET TIMING ON;
+SET AUTOTRACE ON EXPLAIN;
+
+-- Demora detectada: 2500 ms
+EXPLAIN PLAN FOR
+SELECT col1, col2 FROM esquema.tabla WHERE campo = '18009791' AND fecha = TO_DATE('25/2/2026 0:00:00', 'DD/MM/YYYY HH24:MI:SS')
+;
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+SET TIMING OFF;
+SET AUTOTRACE OFF;
+```
+
+**Resolución de parámetros**: El script detecta las líneas de `ExecuteReader: Parameters` (SELECT) y `ExecuteNonQuery: Parameters` (INSERT/UPDATE/DELETE) previas a cada sentencia SQL, y sustituye los bind variables por sus valores reales. Los valores con formato de fecha se convierten automáticamente a `TO_DATE()` de Oracle.
 
 ---
 
@@ -306,6 +325,7 @@ Todos los archivos de salida se generan en el directorio especificado (o en el p
 ```
 C:\logs\KBLogAnalyzer_YYYYMMDD_HHMMSS\
 ├── detectDelays.txt
+├── DelaysSQLStatements.sql
 ├── ErrorWarning.txt
 ├── unknownLogType.txt
 ├── DelaysByProgramDetail.txt
