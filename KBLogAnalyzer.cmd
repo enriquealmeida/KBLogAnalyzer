@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo   KBLogAnalyzer v1.3 (2026.03)
+echo   KBLogAnalyzer v1.4 (2026.03)
 echo ==========================================
 
 setlocal enabledelayedexpansion
@@ -229,7 +229,8 @@ if /i "%callTree%"=="Y" (
 
 if /i "!detectDelays!"=="Y" (
         set "outFile=!directoryLogOutput!\detectDelays.txt"
-        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\detectDelays.ps1" -threshold %threshold% -directoryPath "!directoryLogInput!" -outputFile "!outFile!"
+        set "outSQLFile=!directoryLogOutput!\DelaysSQLStatements.sql"
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\detectDelays.ps1" -threshold %threshold% -directoryPath "!directoryLogInput!" -outputFile "!outFile!" -outputSQLFile "!outSQLFile!"
 )
 
 if /i "%filterErrorWarningAndUnknown%"=="Y" (

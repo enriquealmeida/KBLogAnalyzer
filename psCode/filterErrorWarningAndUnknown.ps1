@@ -34,11 +34,11 @@ foreach ($logFile in $logFiles) {
                 
                 if ($logType -in $validLogTypes) {
                         if ($logType -in @("FATAL", "ERROR", "WARN")) {
-              # Write-OutputAndFile "$currentLine" $errorFile
+               Write-OutputAndFile "$currentLine" $errorFile
                         }
         } else {
-                        $logType
-           # Write-OutputAndFile "$currentLine" $unknownTypeFile
+                        #$logType
+            Write-OutputAndFile "$currentLine" $unknownTypeFile
         }
     }
 }
