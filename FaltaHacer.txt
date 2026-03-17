@@ -1,0 +1,5 @@
+
+* Poner 5 lineas antes y 5 despues de los errores y Warning
+* En la que no tiene LogType, poner la linea antes y luego todas las que siguen. 
+* Calcular la demora que hay entre llamadas a programas. 
+

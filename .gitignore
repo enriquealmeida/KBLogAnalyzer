@@ -1,0 +1,54 @@
+# Directorios de salida y temporales
+TestOutput/
+**/KBLogAnalyzer_*/
+
+# Archivos de salida de análisis
+DelaysByProgramSummary.txt
+DelaysByProgramDetail.txt
+detectDelays.txt
+ErrorWarning.txt
+unknownLogType.txt
+totalByPrograms.txt
+totalByStmt.txt
+LogDuration.txt
+ConnectionAnalysis.txt
+CallTree.txt
+
+# Archivos de log
+*.log
+
+# Directorios de trabajo temporal
+WorkDir*/
+Temp*/
+
+# Archivos de sistema Windows
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Archivos de sistema MacOS (por si se clona en Mac)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+
+# Archivos temporales de PowerShell
+*.ps1~
+
+# Archivos de configuración local (si se agregan en el futuro)
+config.local.*
+settings.local.*
+
+# Archivos de output de Coda
+.coda/
