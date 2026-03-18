@@ -35,7 +35,6 @@ KBLogAnalyzer/
 │   ├── totalByStmt.ps1
 │   ├── logDuration.ps1
 │   ├── connectionAnalysis.ps1
-│   ├── callTree.ps1
 │   └── Write-OutputAndFile.psm1
 │
 ├── TestLogs/                  # Logs de prueba (opcional)
@@ -282,32 +281,6 @@ Handle: 12
 
 ---
 
-### 8. Árbol de Llamadas (Call Tree)
-
-**Script**: `callTree.ps1`
-
-**Descripción**: Genera un árbol jerárquico de llamadas entre programas, mostrando la relación de ejecución y duración aproximada.
-
-**Parámetros**:
-- `directoryPath`: Directorio de entrada con logs
-- `outputFile`: Archivo de salida
-
-**Salida**: `CallTree.txt`
-
-**Formato**:
-```
-=== ARBOL DE EJECUCION ===
-
-ProgramaPrincipal (1.5s)
-  +- SubPrograma1 (450 ms)
-  +- SubPrograma2 (800 ms)
-    +- SubSubPrograma (200 ms)
-```
-
-**Nota**: Los tiempos se calculan aproximadamente usando la diferencia entre el inicio de un programa y el inicio del siguiente con el mismo handle. El último programa de cada handle puede mostrar 0 ms si no hay evento de cierre explícito.
-
----
-
 ## Normalización de Paths
 
 El script principal normaliza automáticamente los paths de entrada y salida:
@@ -334,7 +307,6 @@ C:\logs\KBLogAnalyzer_YYYYMMDD_HHMMSS\
 ├── totalByStmt.txt
 ├── LogDuration.txt
 ├── ConnectionAnalysis.txt
-├── CallTree.txt
 └── *.log (copias de los logs originales)
 ```
 
@@ -358,14 +330,6 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 **Causa**: Path con caracteres especiales o trailing backslashes
 
 **Solución**: El script ya normaliza automáticamente. Si persiste, verificar que el directorio exista.
-
-### Los tiempos en CallTree están en 0 ms
-
-**Causa**: Los logs no contienen eventos de cierre explícito de programas
-
-**Solución**: El script usa una aproximación (tiempo hasta el siguiente programa). Si todos son 0, revisar que los logs contengan líneas con:
-- `gxObject:...handle 'X'`
-- `Start DataStoreProvider.Ctr...handle 'X'...dataStoreHelper:GeneXus.Programs...`
 
 ### Variables no se expanden correctamente
 

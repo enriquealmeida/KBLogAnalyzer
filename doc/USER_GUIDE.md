@@ -63,8 +63,6 @@ Mide demoras por programa? (Y/N): Y
 Calcula duración de archivos de log? (Y/N): Y
 Analiza conexiones a BD (lentas/no cerradas)? (Y/N): Y
 Umbral para conexiones lentas (default 5000 ms): 
-
-Genera arbol de llamadas entre programas? (Y/N): N
 ```
 
 ### Paso 5: Revisar Resultados
@@ -233,25 +231,6 @@ ProgramaB       30000         10       3000
 
 ---
 
-### 8. Árbol de Llamadas
-
-**¿Cuándo usar?**
-- Para entender el flujo de ejecución
-- Para ver la jerarquía de programas
-- Para debugging de flujos complejos
-
-**Salida**: Árbol jerárquico con indentación mostrando:
-- Programa
-- Duración aproximada
-- Nivel de anidamiento (basado en handle)
-
-**Limitaciones**:
-- Duraciones son aproximadas
-- El último programa de cada handle puede mostrar 0 ms
-- Requiere que los logs contengan información de handles
-
----
-
 ## Interpretación de Resultados
 
 ### Formato de Archivos de Salida
@@ -314,7 +293,6 @@ WARNING: Cache eviction due to memory pressure
 2. ✅ Demoras por programa
 3. ✅ Análisis de conexiones (umbral: 2000 ms)
 4. ❌ Totalizar por programa (no es urgente)
-5. ❌ Árbol de llamadas (solo si necesita entender flujo)
 
 **Pasos**:
 1. Ejecutar análisis
@@ -356,7 +334,6 @@ WARNING: Cache eviction due to memory pressure
 3. Revisar `totalByStmt.txt` → identificar queries más frecuentes
 4. Cruzar con `DelaysByProgramSummary.txt` → priorizar optimizaciones
    - Mayor impacto: programas frecuentes Y lentos
-5. Revisar `CallTree.txt` → entender jerarquías y dependencias
 
 ---
 

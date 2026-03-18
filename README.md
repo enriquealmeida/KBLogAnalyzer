@@ -20,7 +20,6 @@
 ✅ **Totalización por programa** - Cuenta ejecuciones de cada programa  
 ✅ **Totalización por SQL** - Identifica queries más frecuentes  
 ✅ **Análisis de conexiones** - Detecta conexiones lentas o no cerradas  
-✅ **Árbol de llamadas** - Visualiza jerarquía de ejecución de programas  
 ✅ **Duración de logs** - Calcula el periodo cubierto por cada log  
 ✅ **Interfaz interactiva** - Configuración paso a paso fácil de usar  
 
@@ -80,7 +79,6 @@ Separa Errores, Warnings y no conocidos? (Y/N): Y
 | **Total por SQL** | `totalByStmt.ps1` | Cuenta ejecuciones de cada sentencia SQL | `totalByStmt.txt` |
 | **Duración de Logs** | `logDuration.ps1` | Calcula inicio, fin y duración de cada log | `LogDuration.txt` |
 | **Análisis de Conexiones** | `connectionAnalysis.ps1` | Detecta conexiones lentas o no cerradas | `ConnectionAnalysis.txt` |
-| **Árbol de Llamadas** | `callTree.ps1` | Genera árbol jerárquico de ejecución | `CallTree.txt` |
 
 ---
 
@@ -102,7 +100,6 @@ KBLogAnalyzer/
 │   ├── totalByStmt.ps1
 │   ├── logDuration.ps1
 │   ├── connectionAnalysis.ps1
-│   ├── callTree.ps1
 │   └── Write-OutputAndFile.psm1   # Módulo compartido
 │
 ├── doc/                           # Documentación detallada
@@ -194,12 +191,6 @@ Puedes especificar un directorio personalizado cuando se te solicite.
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-
-### Los tiempos en CallTree están en 0 ms
-
-**Causa**: Los logs no contienen eventos de cierre explícito de programas
-
-**Solución**: El script usa aproximación (tiempo hasta siguiente programa). Esto es normal en logs de GeneXus que no registran eventos de cierre.
 
 ### Variables no se expanden correctamente
 

@@ -33,10 +33,9 @@
                ├─► totalByProgram.ps1
                ├─► totalByStmt.ps1
                ├─► logDuration.ps1
-               ├─► connectionAnalysis.ps1
-               └─► callTree.ps1
-                   │
-                   └─► Write-OutputAndFile.psm1
+                └─► connectionAnalysis.ps1
+                    │
+                    └─► Write-OutputAndFile.psm1
 ```
 
 ### Tecnologías Utilizadas
@@ -308,79 +307,6 @@ if ($line -match "Close.*handle:(\d+)") {
 
 ---
 
-### 8. callTree.ps1
-
-**Propósito**: Generar árbol jerárquico de llamadas entre programas
-
-**Estructura de Datos**:
-```powershell
-$programs = @(
-    [PSCustomObject]@{
-        Name = "ProgramaA"
-        Handle = 1
-        StartTime = DateTime
-        EndTime = DateTime
-    },
-    ...
-)
-```
-
-**Detección de Programas**:
-```powershell
-# Patrón 1: gxObject con handle
-if ($line -match "gxObject:(\S+),?\s+handle\s+'(\d+)'") {
-    $programFull = $matches[1]
-    $handle = [int]$matches[2]
-    # Crear entrada en $programs
-}
-
-# Patrón 2: DataStoreProvider con handle
-if ($line -match "Start DataStoreProvider\.Ctr.*handle\s+'(\d+)'.*dataStoreHelper:(GeneXus\.Programs\.\S+)") {
-    $handle = [int]$matches[1]
-    $programFull = $matches[2]
-    # Crear entrada en $programs
-}
-```
-
-**Cálculo de EndTime**:
-```powershell
-# Para cada handle, ordenar programas por StartTime
-$groupedByHandle = $programs | Group-Object -Property Handle
-
-foreach ($group in $groupedByHandle) {
-    $handleProgs = $group.Group | Sort-Object StartTime
-    
-    for ($i = 0; $i -lt $handleProgs.Count; $i++) {
-        $currentProg = $handleProgs[$i]
-        
-        # Si no tiene EndTime (no se detectó cierre explícito)
-        if ($null -eq $currentProg.EndTime) {
-            # Usar StartTime del siguiente como EndTime del actual
-            if ($i -lt $handleProgs.Count - 1) {
-                $currentProg.EndTime = $handleProgs[$i + 1].StartTime
-            }
-        }
-    }
-}
-```
-
-**Formato de Salida**:
-```powershell
-# Agrupar por handle y crear indentación basada en nivel
-$level = $handle - 1
-$indent = "  " * $level
-$branch = if ($level -eq 0) { "" } else { "+- " }
-
-Write-OutputAndFile -message "$indent$branch$($prog.Name) ($durationStr)" -filePath $outputFile
-```
-
-**Limitaciones Conocidas**:
-- El último programa de cada handle puede no tener EndTime → duración = 0 ms
-- Asume que handles secuenciales indican niveles de anidamiento
-- No detecta llamadas entre handles diferentes (cross-handle calls)
-
----
-
 ## Script Principal Batch
 
 ### KBLogAnalyzer.cmd
@@ -643,9 +569,8 @@ Usuario  →  KBLogAnalyzer.cmd  →  PowerShell Scripts  →  Archivos Output
 6. **delaysByProgram.ps1** (si seleccionado)
 7. **logDuration.ps1** (si seleccionado)
 8. **connectionAnalysis.ps1** (si seleccionado)
-9. **callTree.ps1** (si seleccionado)
-10. **Copia de logs originales** (batch)
-11. **Apertura de directorio** (batch)
+9. **Copia de logs originales** (batch)
+10. **Apertura de directorio** (batch)
 
 ---
 
