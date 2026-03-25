@@ -206,23 +206,42 @@ if %test%==0 (
 )
 :continue7
 
-:askCallTree
-set callTree=N
-set /p "callTree=Genera arbol de llamadas entre programas? (Y/N): "
+
+:askStmtByProgram
+set stmtByProgram=N
+set /p "stmtByProgram=Lista sentencias SQL ejecutadas por programa? (Y/N): "
 
 :: Convertir a mayúsculas
-for %%i in ("!callTree!") do set callTree=%%~i
+for %%i in ("!stmtByProgram!") do set stmtByProgram=%%~i
 
 :: Validar la entrada
-if /i "%callTree%"=="Y" (
-    goto :continue8
-) else if /i "%callTree%"=="N" (
-    goto :continue8
+if /i "%stmtByProgram%"=="Y" (
+    goto :continue9
+) else if /i "%stmtByProgram%"=="N" (
+    goto :continue9
 ) else (
     echo Entrada no válida. Por favor, ingrese Y o N.
-    goto :askCallTree
+    goto :askStmtByProgram
 )
-:continue8
+:continue9
+
+:askStmtExecutionCount
+set stmtExecutionCount=N
+set /p "stmtExecutionCount=Cuenta ejecuciones de sentencias SQL con parametros? (Y/N): "
+
+:: Convertir a mayúsculas
+for %%i in ("!stmtExecutionCount!") do set stmtExecutionCount=%%~i
+
+:: Validar la entrada
+if /i "%stmtExecutionCount%"=="Y" (
+    goto :continue10
+) else if /i "%stmtExecutionCount%"=="N" (
+    goto :continue10
+) else (
+    echo Entrada no válida. Por favor, ingrese Y o N.
+    goto :askStmtExecutionCount
+)
+:continue10
 
 :execute
 
@@ -275,8 +294,12 @@ if /i "!connectionAnalysis!"=="Y" (
         powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\connectionAnalysis.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\ConnectionAnalysis.txt" -slowConnectionThreshold !connectionThreshold!
 )
 
-if /i "!callTree!"=="Y" (
-        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\callTree.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\CallTree.txt"
+if /i "!stmtByProgram!"=="Y" (
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\stmtByProgram.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\StmtByProgram.txt"
+)
+
+if /i "!stmtExecutionCount!"=="Y" (
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\stmtExecutionCount.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\StmtExecutionCount.txt"
 )
 
 echo.
