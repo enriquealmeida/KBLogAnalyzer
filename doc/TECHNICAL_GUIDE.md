@@ -33,7 +33,10 @@
                ├─► totalByProgram.ps1
                ├─► totalByStmt.ps1
                ├─► logDuration.ps1
-                └─► connectionAnalysis.ps1
+               ├─► connectionAnalysis.ps1
+               ├─► stmtByProgram.ps1
+               ├─► stmtExecutionCount.ps1
+                └─► tableAccessCount.ps1
                     │
                     └─► Write-OutputAndFile.psm1
 ```
@@ -307,6 +310,98 @@ if ($line -match "Close.*handle:(\d+)") {
 
 ---
 
+### 8. stmtByProgram.ps1
+
+**Propósito**: Listar sentencias SQL únicas por programa
+
+**Detección de programa**: Usa dos fuentes para identificar el programa activo:
+```powershell
+# Prioridad 1: dataStoreHelper (líneas Start DataStoreProvider.Ctr)
+if ($line.Contains("dataStoreHelper:")) { ... }
+
+# Prioridad 2: gxObject (líneas de cursor)
+if ($line.Contains("gxObject:")) { ... }
+```
+
+**Estructura de datos**:
+```powershell
+# Hash de hashes: programa → conjunto de sentencias únicas
+$programStmtPairs = @{
+    "pcgcogmer" = @{
+        "INSERT INTO CGMER(...)" = $true
+        "INSERT INTO CGMERMOD(...)" = $true
+    }
+    "pcgcoresmerypag" = @{
+        "SELECT SYSDATE FROM DUAL" = $true
+    }
+}
+```
+
+**Deduplicación**: Usa hashtable como set (valor `$true`) para que cada sentencia aparezca una sola vez por programa.
+
+---
+
+### 9. stmtExecutionCount.ps1
+
+**Propósito**: Contar ejecuciones de sentencias SQL con bind variables resueltos
+
+**Reutiliza funciones de `detectDelays.ps1`**:
+- `ExtractSQL`: Extrae SQL de líneas `stmt:`
+- `ParseParameters`: Extrae pares nombre/valor de líneas `ExecuteReader/ExecuteNonQuery: Parameters`
+- `FormatOracleValue`: Convierte fechas a `TO_DATE()`
+- `ReplaceBindVariables`: Sustituye `:paramName` por valores reales
+
+**Lógica**:
+```powershell
+# 1. Capturar parámetros más recientes
+if ($line -match "Execute(?:Reader|NonQuery): Parameters") {
+    $lastParams = ParseParameters $line
+}
+
+# 2. Extraer SQL, resolver parámetros y contar
+if ($line.Contains("stmt:")) {
+    $sql = ExtractSQL $line
+    $sqlWithValues = ReplaceBindVariables $sql $lastParams
+    $stmtCounts[$sqlWithValues]++
+}
+```
+
+**Salida**: Ordenada por cantidad descendente (mayor cantidad primero)
+
+---
+
+### 10. tableAccessCount.ps1
+
+**Propósito**: Contar accesos a tablas por tipo de operación SQL
+
+**Extracción de tablas por tipo**:
+```powershell
+# INSERT INTO tablename(...)
+if ($upper -match "INSERT\s+INTO\s+(\w+)") { ... }
+
+# UPDATE tablename SET ...
+if ($upper -match "UPDATE\s+(\w+)") { ... }
+
+# DELETE FROM tablename ...
+if ($upper -match "DELETE\s+FROM\s+(\w+)") { ... }
+
+# SELECT ... FROM tablename [JOIN tablename2] ...
+# Extrae entre FROM y WHERE/ORDER/GROUP/HAVING
+# Maneja JOINs (INNER, LEFT, RIGHT, FULL, CROSS) y comma-joins
+```
+
+**Estructura de datos**:
+```powershell
+$tableCounts = @{
+    "CGMER" = @{ INSERT = 45; UPDATE = 3; DELETE = 0; SELECT = 0 }
+    "TGERROR" = @{ INSERT = 0; UPDATE = 0; DELETE = 0; SELECT = 8 }
+}
+```
+
+**Salida**: Tabla formateada con columnas alineadas, ordenada alfabéticamente, con fila de totales.
+
+---
+
 ## Script Principal Batch
 
 ### KBLogAnalyzer.cmd
@@ -569,8 +664,11 @@ Usuario  →  KBLogAnalyzer.cmd  →  PowerShell Scripts  →  Archivos Output
 6. **delaysByProgram.ps1** (si seleccionado)
 7. **logDuration.ps1** (si seleccionado)
 8. **connectionAnalysis.ps1** (si seleccionado)
-9. **Copia de logs originales** (batch)
-10. **Apertura de directorio** (batch)
+9. **stmtByProgram.ps1** (si seleccionado)
+10. **stmtExecutionCount.ps1** (si seleccionado)
+11. **tableAccessCount.ps1** (si seleccionado)
+12. **Copia de logs originales** (batch)
+13. **Apertura de directorio** (batch)
 
 ---
 

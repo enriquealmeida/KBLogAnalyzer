@@ -63,6 +63,9 @@ Mide demoras por programa? (Y/N): Y
 Calcula duración de archivos de log? (Y/N): Y
 Analiza conexiones a BD (lentas/no cerradas)? (Y/N): Y
 Umbral para conexiones lentas (default 5000 ms): 
+Lista sentencias SQL ejecutadas por programa? (Y/N): Y
+Cuenta ejecuciones de sentencias SQL con parametros? (Y/N): Y
+Cuenta accesos a tablas por tipo de operacion SQL? (Y/N): Y
 ```
 
 ### Paso 5: Revisar Resultados
@@ -228,6 +231,55 @@ ProgramaB       30000         10       3000
 **Salidas**:
 - Conexiones lentas al abrirse
 - Conexiones que no fueron cerradas explícitamente
+
+---
+
+### 8. Sentencias SQL por Programa
+
+**¿Cuándo usar?**
+- Para entender qué sentencias SQL ejecuta cada programa
+- Para auditar el acceso a datos por módulo
+- Para identificar programas que acceden a tablas inesperadas
+
+**No requiere parámetros adicionales**
+
+**Salida**: `StmtByProgram.txt` — Lista cada programa con sus sentencias SQL únicas (sin repetidos)
+
+**Nota**: Una misma sentencia puede aparecer en múltiples programas si ambos la ejecutan.
+
+---
+
+### 9. Conteo de Ejecuciones SQL con Parámetros
+
+**¿Cuándo usar?**
+- Para saber exactamente qué datos se consultaron o modificaron
+- Para identificar sentencias ejecutadas con valores específicos
+- Para reproducir problemas ejecutando las sentencias resultantes en la BD
+
+**No requiere parámetros adicionales**
+
+**Salida**: `StmtExecutionCount.txt` — Sentencias SQL con bind variables resueltos, ordenadas por cantidad de ejecuciones (mayor a menor)
+
+**Diferencia con "Total por SQL"**: Esta opción reemplaza los `:paramName` por los valores reales, por lo que `SELECT ... WHERE id = '100'` y `SELECT ... WHERE id = '200'` cuentan como sentencias distintas.
+
+---
+
+### 10. Accesos a Tablas por Tipo de Operación
+
+**¿Cuándo usar?**
+- Para tener una visión general de qué tablas se usan y cómo
+- Para identificar tablas con mucha actividad de escritura (INSERT/UPDATE/DELETE)
+- Para auditoría de acceso a datos
+- Para planificar índices o particionamiento
+
+**No requiere parámetros adicionales**
+
+**Salida**: `TableAccessCount.txt` — Tabla con columnas: nombre de tabla, cantidad de INSERT, UPDATE, DELETE, SELECT y total
+
+**Interpretación**:
+- Tablas con muchos INSERT/UPDATE → candidatas a optimización de escritura
+- Tablas con muchos SELECT → candidatas a índices adicionales
+- Tablas sin actividad → posible código muerto
 
 ---
 

@@ -21,7 +21,10 @@
 ✅ **Totalización por SQL** - Identifica queries más frecuentes  
 ✅ **Análisis de conexiones** - Detecta conexiones lentas o no cerradas  
 ✅ **Duración de logs** - Calcula el periodo cubierto por cada log  
-✅ **Interfaz interactiva** - Configuración paso a paso fácil de usar  
+✅ **SQL por programa** - Lista sentencias SQL únicas ejecutadas por cada programa  
+✅ **Conteo de ejecuciones SQL** - Cuenta ejecuciones con parámetros resueltos  
+✅ **Accesos a tablas** - Cuenta INSERT/UPDATE/DELETE/SELECT por tabla  
+✅ **Interfaz interactiva** - Configuración paso a paso fácil de usar
 
 ---
 
@@ -79,6 +82,9 @@ Separa Errores, Warnings y no conocidos? (Y/N): Y
 | **Total por SQL** | `totalByStmt.ps1` | Cuenta ejecuciones de cada sentencia SQL | `totalByStmt.txt` |
 | **Duración de Logs** | `logDuration.ps1` | Calcula inicio, fin y duración de cada log | `LogDuration.txt` |
 | **Análisis de Conexiones** | `connectionAnalysis.ps1` | Detecta conexiones lentas o no cerradas | `ConnectionAnalysis.txt` |
+| **SQL por Programa** | `stmtByProgram.ps1` | Lista sentencias SQL únicas por programa | `StmtByProgram.txt` |
+| **Conteo Ejecuciones SQL** | `stmtExecutionCount.ps1` | Cuenta ejecuciones SQL con parámetros resueltos | `StmtExecutionCount.txt` |
+| **Accesos a Tablas** | `tableAccessCount.ps1` | Cuenta accesos por tabla y tipo de operación | `TableAccessCount.txt` |
 
 ---
 
@@ -100,6 +106,9 @@ KBLogAnalyzer/
 │   ├── totalByStmt.ps1
 │   ├── logDuration.ps1
 │   ├── connectionAnalysis.ps1
+│   ├── stmtByProgram.ps1
+│   ├── stmtExecutionCount.ps1
+│   ├── tableAccessCount.ps1
 │   └── Write-OutputAndFile.psm1   # Módulo compartido
 │
 ├── doc/                           # Documentación detallada

@@ -35,6 +35,9 @@ KBLogAnalyzer/
 │   ├── totalByStmt.ps1
 │   ├── logDuration.ps1
 │   ├── connectionAnalysis.ps1
+│   ├── stmtByProgram.ps1
+│   ├── stmtExecutionCount.ps1
+│   ├── tableAccessCount.ps1
 │   └── Write-OutputAndFile.psm1
 │
 ├── TestLogs/                  # Logs de prueba (opcional)
@@ -281,6 +284,84 @@ Handle: 12
 
 ---
 
+### 8. Sentencias SQL por Programa
+
+**Script**: `stmtByProgram.ps1`
+
+**Descripción**: Lista las sentencias SQL únicas ejecutadas por cada programa GeneXus. Detecta el programa activo mediante líneas `dataStoreHelper:` y `gxObject:`, y asocia las sentencias SQL (`stmt:`) que le siguen. Cada sentencia aparece una sola vez por programa, aunque se ejecute múltiples veces.
+
+**Parámetros**:
+- `directoryPath`: Directorio de entrada con logs
+- `outputFile`: Archivo de salida
+
+**Salida**: `StmtByProgram.txt`
+
+**Formato**:
+```
+pcgcogmer
+  INSERT INTO CGMER(CGTpoTrans, ...) VALUES(:CGTpoTrans, ...)
+  INSERT INTO CGMERMOD(CGTpoTrans, ...) VALUES(:CGTpoTrans, ...)
+
+pcgcoresmerypag
+  SELECT CODI_ERROR, TRANCA, DESC_ERROR FROM TGERROR WHERE ...
+  SELECT SYSDATE FROM DUAL
+```
+
+**Nota**: Si una misma sentencia es ejecutada por dos programas diferentes, aparece listada en ambos.
+
+---
+
+### 9. Conteo de Ejecuciones SQL con Parámetros
+
+**Script**: `stmtExecutionCount.ps1`
+
+**Descripción**: Recorre todos los logs, extrae cada sentencia SQL y la completa reemplazando los bind variables (`:paramName`) con los valores reales de la línea `ExecuteReader/ExecuteNonQuery: Parameters` más reciente. Luego cuenta cuántas veces se ejecutó cada sentencia resuelta y las ordena de mayor a menor cantidad.
+
+**Parámetros**:
+- `directoryPath`: Directorio de entrada con logs
+- `outputFile`: Archivo de salida
+
+**Salida**: `StmtExecutionCount.txt`
+
+**Formato**:
+```
+    45 | SELECT SYSDATE FROM DUAL
+    12 | INSERT INTO CGMER('4  ', '0', ...) VALUES(...)
+     3 | SELECT CODI_ERROR, TRANCA, DESC_ERROR FROM TGERROR WHERE CODI_ERROR = '2472' ORDER BY CODI_ERROR
+```
+
+**Resolución de parámetros**: Reutiliza la misma lógica de `detectDelays.ps1` para sustituir bind variables por valores reales y convertir fechas a formato `TO_DATE()` de Oracle.
+
+---
+
+### 10. Accesos a Tablas por Tipo de Operación
+
+**Script**: `tableAccessCount.ps1`
+
+**Descripción**: Analiza todas las sentencias SQL del log, identifica las tablas accedidas y cuenta los accesos por tipo de operación (INSERT, UPDATE, DELETE, SELECT). Maneja JOINs y múltiples tablas en SELECTs.
+
+**Parámetros**:
+- `directoryPath`: Directorio de entrada con logs
+- `outputFile`: Archivo de salida
+
+**Salida**: `TableAccessCount.txt`
+
+**Formato**:
+```
+TABLA                          |  #INSERT |  #UPDATE |  #DELETE |  #SELECT |   #TOTAL
+-------------------------------+----------+----------+----------+----------+---------
+CGCON                          |        0 |        0 |        0 |       12 |       12
+CGMER                          |       45 |        3 |        0 |        0 |       48
+CGMERMOD                       |       45 |        0 |        0 |        0 |       45
+TGERROR                        |        0 |        0 |        0 |        8 |        8
+-------------------------------+----------+----------+----------+----------+---------
+TOTAL                          |       90 |        3 |        0 |       20 |      113
+```
+
+**Tablas ordenadas alfabéticamente** con fila de totales al final.
+
+---
+
 ## Normalización de Paths
 
 El script principal normaliza automáticamente los paths de entrada y salida:
@@ -307,6 +388,9 @@ C:\logs\KBLogAnalyzer_YYYYMMDD_HHMMSS\
 ├── totalByStmt.txt
 ├── LogDuration.txt
 ├── ConnectionAnalysis.txt
+├── StmtByProgram.txt
+├── StmtExecutionCount.txt
+├── TableAccessCount.txt
 └── *.log (copias de los logs originales)
 ```
 

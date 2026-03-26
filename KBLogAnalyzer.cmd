@@ -243,6 +243,24 @@ if /i "%stmtExecutionCount%"=="Y" (
 )
 :continue10
 
+:askTableAccessCount
+set tableAccessCount=N
+set /p "tableAccessCount=Cuenta accesos a tablas por tipo de operacion SQL? (Y/N): "
+
+:: Convertir a mayúsculas
+for %%i in ("!tableAccessCount!") do set tableAccessCount=%%~i
+
+:: Validar la entrada
+if /i "%tableAccessCount%"=="Y" (
+    goto :continue11
+) else if /i "%tableAccessCount%"=="N" (
+    goto :continue11
+) else (
+    echo Entrada no válida. Por favor, ingrese Y o N.
+    goto :askTableAccessCount
+)
+:continue11
+
 :execute
 
 
@@ -300,6 +318,10 @@ if /i "!stmtByProgram!"=="Y" (
 
 if /i "!stmtExecutionCount!"=="Y" (
         powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\stmtExecutionCount.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\StmtExecutionCount.txt"
+)
+
+if /i "!tableAccessCount!"=="Y" (
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\tableAccessCount.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\TableAccessCount.txt"
 )
 
 echo.
