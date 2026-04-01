@@ -2,7 +2,7 @@
 
 **Herramienta de análisis de logs para aplicaciones GeneXus en Windows**
 
-![Version](https://img.shields.io/badge/version-1.4-blue)
+![Version](https://img.shields.io/badge/version-1.5-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue)
 

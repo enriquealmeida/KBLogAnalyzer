@@ -54,6 +54,7 @@ Responder **Y** (Sí) o **N** (No) a cada opción:
 
 ```
 Desea detectar demoras? (Y/N): Y
+Generar archivo CSV con numero de linea y milisegundos transcurridos? (Y/N): Y
 Mostrar logs que demoran mas que (default 500 ms): 1000
 
 Separa Errores, Warnings y no conocidos? (Y/N): Y

@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo   KBLogAnalyzer v1.4 (2026.03)
+echo   KBLogAnalyzer v1.5 (2026.03)
 echo ==========================================
 
 setlocal enabledelayedexpansion
@@ -261,6 +261,24 @@ if /i "%tableAccessCount%"=="Y" (
 )
 :continue11
 
+:askGenerateCsvDuration
+set generateCsvDuration=N
+set /p "generateCsvDuration=Generar archivo CSV con numero de linea y milisegundos transcurridos? (Y/N): "
+
+:: Convertir a mayúsculas
+for %%i in ("!generateCsvDuration!") do set generateCsvDuration=%%~i
+
+:: Validar la entrada
+if /i "%generateCsvDuration%"=="Y" (
+    goto :continue12
+) else if /i "%generateCsvDuration%"=="N" (
+    goto :continue12
+) else (
+    echo Entrada no válida. Por favor, ingrese Y o N.
+    goto :askGenerateCsvDuration
+)
+:continue12
+
 :execute
 
 
@@ -324,6 +342,18 @@ if /i "!tableAccessCount!"=="Y" (
         powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\tableAccessCount.ps1" -directoryPath "!directoryLogInput!" -outputFile "!directoryLogOutput!\TableAccessCount.txt"
 )
 
+if /i "!detectDelays!"=="Y" (
+        set "outFile=!directoryLogOutput!\detectDelays.txt"
+        set "outSQLFile=!directoryLogOutput!\DelaysSQLStatements.sql"
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\detectDelays.ps1" -threshold %threshold% -directoryPath "!directoryLogInput!" -outputFile "!outFile!" -outputSQLFile "!outSQLFile!"
+)
+
+if /i "%generateCsvDuration%"=="Y" (
+        set "outCsvFile=!directoryLogOutput!\LogLineDuration.csv"
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "pscode\generateCsvDuration.ps1" -directoryPath "!directoryLogInput!" -outputFile "!outCsvFile!"
+)
+
+
 echo.
 echo Copiando logs procesados al directorio de salida...
 xcopy "!directoryLogInput!\*.log" "!directoryLogOutput!" /Y /Q 2>nul
@@ -337,6 +367,8 @@ echo Proceso completado.
 echo.
 echo Abriendo directorio de salida...
 explorer "!directoryLogOutput!"
+
+
 
 exit
 
